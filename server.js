@@ -68,6 +68,8 @@ io.on("connection", (socket) => {
     socket.on('move', (input) => {
         const user = users.getCurrentUser(socket.id);
 
+		console.log(`${socket.id} enter "${input}"`);
+
         socket.broadcast().to(user.room).emit('moveMade', {
             room: user.room,
             id: socket.id,

@@ -33,6 +33,7 @@ io.on("connection", (socket) => {
 			socket.join(room);
 
 			console.log(`room ${room} created`);
+			console.log(`${socket.id} joined room ${room}`);
 
 			socket.emit("roomCreated", {
 				room,
@@ -56,10 +57,10 @@ io.on("connection", (socket) => {
 
 			console.log(`${socket.id} joined room ${room}`);
 
-			socket.emit("roomJoined", {
+			io.to(room).emit("roomJoined", {
 				room,
 				players: 2,
-				playerId: socket.id,
+				id: socket.id,
 			});
 		}
 	});
@@ -72,11 +73,11 @@ io.on("connection", (socket) => {
 		} else {
 			console.log(`${socket.id} enter "${input}"`);
 
-			socket.broadcast.to(user.room).emit("moveMade", {
+			io.to(user.room).emit('moveMade', {
 				room: user.room,
 				id: socket.id,
-				input: input,
-			});
+				input: input
+			})
 		}
 	});
 });

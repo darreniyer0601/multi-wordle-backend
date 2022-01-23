@@ -2,7 +2,7 @@ const http = require("http");
 const express = require("express");
 const cors = require("cors");
 const socketio = require("socket.io");
-require('dotenv').config();
+require("dotenv").config();
 
 const users = require("./users");
 
@@ -25,8 +25,8 @@ io.on("connection", (socket) => {
 		const roomUsers = users.getRoomUsers(room);
 
 		if (roomUsers.length !== 0) {
-            console.log('room exists');
-			socket.emit("roomExists", 'Room already exists');
+			console.log("room exists");
+			socket.emit("roomExists", "Room already exists");
 		} else {
 			users.userJoin(socket.id, room);
 
@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
 			socket.emit("roomCreated", {
 				room,
 				players: 1,
-                id: socket.id
+				id: socket.id,
 			});
 		}
 	});
@@ -47,35 +47,38 @@ io.on("connection", (socket) => {
 
 		if (roomUsers.length === 0) {
 			socket.emit("noSuchRoom");
-		}
-		else if (roomUsers.length === 2) {
+		} else if (roomUsers.length === 2) {
 			socket.emit("roomFull");
 		} else {
-            users.userJoin(socket.id, room);
+			users.userJoin(socket.id, room);
 
 			socket.join(room);
 
-            console.log(`${socket.id} joined room ${room}`);
+			console.log(`${socket.id} joined room ${room}`);
 
 			socket.emit("roomJoined", {
-                room,
-                players: 2,
-                playerId: socket.id
-            });
+				room,
+				players: 2,
+				playerId: socket.id,
+			});
 		}
 	});
 
-    socket.on('move', (input) => {
-        const user = users.getCurrentUser(socket.id);
+	socket.on("move", (input) => {
+		const user = users.getCurrentUser(socket.id);
 
-		console.log(`${socket.id} enter "${input}"`);
+		if (!user) {
+			socket.emit("noUser", "User does not exist");
+		} else {
+			console.log(`${socket.id} enter "${input}"`);
 
-        socket.broadcast.to(user.room).emit('moveMade', {
-            room: user.room,
-            id: socket.id,
-            input: input
-        })
-    })
+			socket.broadcast.to(user.room).emit("moveMade", {
+				room: user.room,
+				id: socket.id,
+				input: input,
+			});
+		}
+	});
 });
 
 const PORT = process.env.PORT || 8000;

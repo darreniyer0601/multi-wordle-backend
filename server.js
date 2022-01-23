@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
 		}
 	});
 
-	socket.on("joinRoom", (room) => {
+	socket.on("joinRoom", ({ room, givenWord }) => {
 		const roomUsers = users.getRoomUsers(room);
 
 		if (roomUsers.length === 0) {
@@ -59,13 +59,14 @@ io.on("connection", (socket) => {
 
 			io.to(room).emit("roomJoined", {
 				room,
+				givenWord,
 				players: 2,
 				id: socket.id,
 			});
 		}
 	});
 
-	socket.on("move", (input) => {
+	socket.on("move", ({input, givenWord}) => {
 		const user = users.getCurrentUser(socket.id);
 
 		if (!user) {
@@ -76,7 +77,8 @@ io.on("connection", (socket) => {
 			io.to(user.room).emit('moveMade', {
 				room: user.room,
 				id: socket.id,
-				input: input
+				input: input,
+				givenWord: givenWord
 			})
 		}
 	});

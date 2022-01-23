@@ -70,7 +70,7 @@ io.on("connection", (socket) => {
 
 		console.log(`${socket.id} enter "${input}"`);
 
-        socket.broadcast().to(user.room).emit('moveMade', {
+        socket.broadcast.to(user.room).emit('moveMade', {
             room: user.room,
             id: socket.id,
             input: input
